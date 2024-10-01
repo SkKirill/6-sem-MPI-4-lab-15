@@ -47,25 +47,62 @@ int main(int argc, char* argv[]) {
 		printArray(array, rows);//вывод матрицы
 	}
 
-	int blocklengths[rows]{}; // массив с длинами блоков
-	blocklengths[0] = 2;
-	for (int i = 1; i < rows - 1; i++)
+	int blocklengths[rows * 2 - 4]{}; // массив с длинами блоков
+	int count = (rows * 2 - 4);
+	int i = 0;
+	blocklengths[i] = rows / 2;
+	i++;
+	for (; i < (count / 2) - 1; i++)
 	{
-		blocklengths[i] = 3;
+		blocklengths[i] = 1;
 	}
-	blocklengths[rows - 1] = 2;
-
-	int displacements[cols]{};
-	displacements[0] = 0;
-	displacements[1] = cols;
-
-	for (int i = 2; i < cols; i++)
+	i++;
+	blocklengths[i] = rows / 2;
+	i++;
+	blocklengths[i] = rows / 2;
+	for (; i < count - 1; i++)
 	{
-		displacements[i] = displacements[i-1] + cols + 1;
+		blocklengths[i] = 1;
 	}
+	i++;
+	blocklengths[count] = rows / 2;
+
+
+	int displacements[rows * 2 - 4]{};
+	int count = (rows * 2 - 4);
+	int i = 0;
+	displacements[i] = 0;
+	i++;
+	displacements[i] = cols;
+	i++;
+	for (; i < (count / 2) - 1; i++)
+	{
+		if (i % 2 == 0) {
+			displacements[i] = displacements[i - 1] + cols / 2;
+		}
+		else {
+			displacements[i] = displacements[i - 1] + (cols - cols / 2);
+		}
+	}
+	i++;
+	displacements[i] = displacements[i - 1] + (cols - cols / 2);
+	i++;
+	displacements[i] = displacements[i - 1] + cols + cols / 2;
+	i++;
+	displacements[i] = displacements[i - 1] + cols;
+	for (; i < count; i++)
+	{
+		if (i % 2 == 0) {
+			displacements[i] = displacements[i - 1] + cols / 2;
+		}
+		else {
+			displacements[i] = displacements[i - 1] + (cols - cols / 2);
+		}
+	}
+
 	MPI_Datatype MyDataType; // создаем свой тип
 
-	MPI_Type_indexed(rows, blocklengths, displacements, MPI_INT, &MyDataType); //функция-конструктор нашего типа
+	MPI_Type_indexed(rows * 2 - 4, blocklengths, displacements, MPI_INT, &MyDataType); //функция-конструктор нашего типа
 	MPI_Type_commit(&MyDataType);//регистрирует созданный производный тип.
 
 	if (rank == 0)
