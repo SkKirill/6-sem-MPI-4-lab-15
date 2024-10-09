@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const int rows = 6; // Константы чтобы задавать везде одинаковую матрицу
-const int cols = 6;
+const int rows = 3; // Константы чтобы задавать везде одинаковую матрицу
+const int cols = 3;
 
 // Процедура printArray - выводит матрицу в консоль
 void printArray(int array[rows][cols], int rows)
@@ -23,7 +23,6 @@ void printArray(int array[rows][cols], int rows)
 	}
 	cout << endl;
 }
-
 
 int main(int argc, char* argv[]) {
 	int rank, size;
@@ -47,62 +46,23 @@ int main(int argc, char* argv[]) {
 		printArray(array, rows);//вывод матрицы
 	}
 
-	int blocklengths[rows * 2 - 4]{}; // массив с длинами блоков
-	int count = (rows * 2 - 4);
-	int i = 0;
-	blocklengths[i] = rows / 2;
-	i++;
-	for (; i < (count / 2) - 1; i++)
+	int blocklengths[rows]{}; // массив с длинами блоков
+	blocklengths[0] = 2;
+	for (int i = 1; i < rows - 1; i++)
 	{
-		blocklengths[i] = 1;
+		blocklengths[i] = 3;
 	}
-	i++;
-	blocklengths[i] = rows / 2;
-	i++;
-	blocklengths[i] = rows / 2;
-	for (; i < count - 1; i++)
+	blocklengths[rows - 1] = 2;
+	int displacements[rows]{};
+	displacements[0] = 0;
+	displacements[1] = cols;
+	for (int i = 2; i < rows; i++)
 	{
-		blocklengths[i] = 1;
+		displacements[i] = displacements[i - 1] + cols + 1;
 	}
-	i++;
-	blocklengths[count] = rows / 2;
-
-
-	int displacements[rows * 2 - 4]{};
-	count = (rows * 2 - 4);
-    i = 0;
-	displacements[i] = 0;
-	i++;
-	displacements[i] = cols;
-	i++;
-	for (; i < (count / 2) - 1; i++)
-	{
-		if (i % 2 == 0) {
-			displacements[i] = displacements[i - 1] + cols / 2;
-		}
-		else {
-			displacements[i] = displacements[i - 1] + (cols - cols / 2);
-		}
-	}
-	i++;
-	displacements[i] = displacements[i - 1] + (cols - cols / 2);
-	i++;
-	displacements[i] = displacements[i - 1] + cols + cols / 2;
-	i++;
-	displacements[i] = displacements[i - 1] + cols;
-	for (; i < count; i++)
-	{
-		if (i % 2 == 0) {
-			displacements[i] = displacements[i - 1] + cols / 2;
-		}
-		else {
-			displacements[i] = displacements[i - 1] + (cols - cols / 2);
-		}
-	}
-
 	MPI_Datatype MyDataType; // создаем свой тип
 
-	MPI_Type_indexed(rows * 2 - 4, blocklengths, displacements, MPI_INT, &MyDataType); //функция-конструктор нашего типа
+	MPI_Type_indexed(rows, blocklengths, displacements, MPI_INT, &MyDataType); //функция-конструктор нашего типа
 	MPI_Type_commit(&MyDataType);//регистрирует созданный производный тип.
 
 	if (rank == 0)
