@@ -69,8 +69,8 @@ int main(int argc, char* argv[]) {
 
 
 	int displacements[rows * 2 - 4]{};
-	int count = (rows * 2 - 4);
-	int i = 0;
+	count = (rows * 2 - 4);
+    i = 0;
 	displacements[i] = 0;
 	i++;
 	displacements[i] = cols;
